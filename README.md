@@ -126,12 +126,12 @@ List of valid basin names.
 
 This package contains pre-trained Input-Output Hidden Markov Models (IOHMM) for 7 tropical cyclone basins. The models were pre-trained on ERA5 monthly data using multiple environmental predictors known to influence tropical cyclone intensity:
 
-1. **Ocean coupling (ILD, grd)**: Ocean thermal structure and mixing
+1. **Ocean coupling (ILD, grd)**: Ocean thermal structure affecting ocean feedback
 2. **Storm motion (ut)**: Translation speed affecting ocean feedback
 3. **Potential intensity (pi)**: Theoretical upper bound on storm strength
-4. **Wind shear (shr)**: Vertical wind shear limiting intensification
-5. **Mid-level humidity (rh600)**: Environmental moisture
-6. **Land effects (mean_stl1, mean_fsr, mean_swvl1)**: Soil conditions for over-land decay
+4. **Wind shear (shr)**: Vertical wind shear affecting intensification
+5. **Mid-level humidity (rh600)**: Environmental moisture affecting intensification
+6. **Land effects (mean_fsr, mean_stv1, mean_swvl1)**: Land and soil conditions affecting over-land decay
 
 Each basin has its own pre-trained IOHMM parameters and land-mode regression coefficients.
 
