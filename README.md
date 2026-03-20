@@ -5,7 +5,7 @@ Predict tropical cyclone intensity using pre-trained Input-Output Hidden Markov 
 ## Installation
 
 ```bash
-pip install pepc-global-intensity
+pip install --upgrade pepc-global-intensity
 ```
 
 ## Usage
