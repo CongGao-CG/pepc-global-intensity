@@ -114,12 +114,12 @@ List of valid basin names.
 | grd          | Ocean temperature gradient           | K m^−1        |
 | ut           | Storm translation speed              | m s^−1        |
 | pi           | Potential intensity                  | kt            |
-| shr          | Wind shear                           | m s^−1        |
-| rh600        | Relative humidity at 600 hPa         | —             |
-| ocean        | Whether the current point is over ocean | —          |
-| ocean_next   | Whether the next point is over ocean | —             |
+| shr          | Vertical wind shear between 200 hPa and 850 hPa | m s^−1        |
+| rh600        | Relative humidity at 600 hPa         | %             |
+| ocean        | fraction at the current position     | —             |
+| ocean_next   | fraction at the next 6-hour position | —             |
 | mean_stl1    | Land-weighted soil temperature       | K             |
-| mean_fsr     | Land-weighted fraction of sunshine radiation | —    |
+| mean_fsr     | Land-weighted surface roughness length | m           |
 | mean_swvl1   | Land-weighted soil water volume      | m^3 m^−3      |
 
 ## Model Details
