@@ -264,11 +264,11 @@ def predict_intensity(
         step, time, year, mode, ILD, grd, ut, pi, shr, rh600,
         ocean, ocean_next, mean_stl1, mean_fsr, mean_swvl1.
     experiment : str
-        CMIP6 experiment ("historical" or "ssp585").
+        CMIP6 experiment ("historical", "ssp585", or "ssp245").
     model : str
-        CMIP6 model name (used for ssp585 ubound schedule lookup).
+        CMIP6 model name (used for SSP ubound schedule lookup).
     variant : str
-        CMIP6 variant label (used for ssp585 ubound schedule lookup).
+        CMIP6 variant label (used for SSP ubound schedule lookup).
     seed : int or None
         Random seed for reproducibility. If None, a random seed is used.
 
