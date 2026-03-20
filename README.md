@@ -116,8 +116,8 @@ List of valid basin names.
 | pi           | Potential intensity                  | kt            |
 | shr          | Vertical wind shear between 200 hPa and 850 hPa | m s^−1        |
 | rh600        | Relative humidity at 600 hPa         | %             |
-| ocean        | fraction at the current position     | —             |
-| ocean_next   | fraction at the next 6-hour position | —             |
+| ocean        | ocean fraction at the current position | —           |
+| ocean_next   | ocean fraction at the next 6-hour position | —       |
 | mean_stl1    | Land-weighted soil temperature       | K             |
 | mean_fsr     | Land-weighted surface roughness length | m           |
 | mean_swvl1   | Land-weighted soil water volume      | m^3 m^−3      |
