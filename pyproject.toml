@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pepc-global-intensity"
+version = "0.1.0"
+authors = [
+    { name = "Cong Gao", email = "cong.gao@princeton.edu" }
+]
+description = "Predict tropical cyclone intensity using pre-trained Input-Output Hidden Markov Models"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = [
+    "numpy>=1.21",
+    "pandas>=1.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/CongGao-CG/pepc-global-intensity"
+Repository = "https://github.com/CongGao-CG/pepc-global-intensity.git"
+
+[tool.setuptools.packages.find]
+include = ["pepc_global_intensity*"]
+
+[tool.setuptools.package-data]
+pepc_global_intensity = ["data/*.pkl", "data/*.npy", "data/*.tsv"]
