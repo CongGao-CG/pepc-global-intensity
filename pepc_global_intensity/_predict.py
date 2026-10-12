@@ -20,6 +20,9 @@ N_STATES = 3
 WIND_TO_MS = 0.514
 MIN_PRE_WIND = 10.0
 exponent_upbound = 2
+LAND_T_C = 299.0
+LAND_W_T = 0.2
+LAND_W_T1 = 0.8
 
 
 @lru_cache(maxsize=None)
@@ -40,8 +43,8 @@ def _load_parameters_for_basin(basin: str) -> Dict[str, Any]:
         },
     }
 
-    coeffs_path = DATA_DIR / f"intensity_land_exp-predictors-dry-rough_{basin}_coeffs.npy"
-    sigma_path = DATA_DIR / f"intensity_land_exp-predictors-dry-rough_{basin}_noise-sigma.npy"
+    coeffs_path = DATA_DIR / f"intensity_land_exp-alpha-flux_{basin}_coeffs.npy"
+    sigma_path = DATA_DIR / f"intensity_land_exp-alpha-flux_{basin}_noise-sigma.npy"
     land_coeffs = np.load(coeffs_path)
     land_sigma = np.load(sigma_path)
 
@@ -106,9 +109,8 @@ def _process_group(
     rh600 = group["rh600"].to_numpy()
     ocean = group["ocean"].to_numpy()
     ocean_next = group["ocean_next"].to_numpy()
-    mean_stl1 = group["mean_stl1"].to_numpy()
-    mean_fsr = group["mean_fsr"].to_numpy()
-    mean_swvl1 = group["mean_swvl1"].to_numpy()
+    mean_stl1 = group["mean_stl1"].to_numpy(dtype=float)
+    mean_swvl1 = group["mean_swvl1"].to_numpy(dtype=float)
 
     pre_wind = group["pre_wind"].to_numpy(copy=True)
     pre_delta_wind_b = group["pre_delta_wind_b"].to_numpy(copy=True)
@@ -122,6 +124,13 @@ def _process_group(
 
     with np.errstate(divide="ignore", invalid="ignore"):
         ocn_base = -0.01 * np.power(grd * 100.0, -0.4) * ild * ut * pi_vals
+
+    # mean_stl1/mean_swvl1 are land-weighted sums, so dividing by lbar gives the land means
+    lbar = LAND_W_T * (1 - ocean.astype(float)) + LAND_W_T1 * (1 - ocean_next.astype(float))
+    with np.errstate(divide="ignore", invalid="ignore", over="ignore"):
+        t_bar = mean_stl1 / lbar
+        theta_bar = mean_swvl1 / lbar
+        land_flux = theta_bar * np.maximum(0.0, np.exp(0.07 * (t_bar - LAND_T_C)) - 1)
 
     hmm_params = basin_params["hmm"]
     hmm_states = tuple(hmm_params["States"])
@@ -216,20 +225,9 @@ def _process_group(
                     pred = float(pred + local_rng.normal(loc=0.0, scale=sd))
         elif mode_val == "land":
             if land_coeffs is not None:
-                features = np.asarray(
-                    [
-                        (
-                            pre_wind[pos],
-                            mean_stl1[pos],
-                            mean_fsr[pos],
-                            mean_swvl1[pos],
-                        )
-                    ],
-                    dtype=float,
-                )
-                logratio_pred = float(land_coeffs[0] + np.dot(land_coeffs[1:], features[:, 1:].ravel()))
-                pred = np.exp(logratio_pred) * (features[:, 0] - MIN_PRE_WIND) + MIN_PRE_WIND - features[:, 0]
-                pred = float(np.asarray(pred).ravel()[0])
+                alpha = np.exp(land_coeffs[0] + land_coeffs[1] * land_flux[pos])
+                wind_val = pre_wind[pos]
+                pred = float((wind_val - MIN_PRE_WIND) * (np.exp(-alpha * lbar[pos]) - 1.0))
         elif mode_val == "not":
             pred = np.nan
 
@@ -262,7 +260,7 @@ def predict_intensity(
     df : pd.DataFrame
         Pre-prepared DataFrame for one storm. Required columns:
         step, time, year, mode, ILD, grd, ut, pi, shr, rh600,
-        ocean, ocean_next, mean_stl1, mean_fsr, mean_swvl1.
+        ocean, ocean_next, mean_stl1, mean_swvl1.
     experiment : str
         CMIP6 experiment ("historical", "ssp585", or "ssp245").
     model : str

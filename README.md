@@ -25,7 +25,7 @@ from pepc_global_intensity import predict_intensity
 # Create DataFrame for a single storm with required columns
 df = pd.DataFrame({
     "step":       [0, 1, 2],
-    "time":       pd.to_datetime(["2000-07-01", "2000-07-01 06:00", "2000-07-01 12:00"]),
+    "time":       pd.to_datetime(["2000-07-01 00:00", "2000-07-01 06:00", "2000-07-01 12:00"]),
     "year":       [2000, 2000, 2000],
     "mode":       ["ocean", "ocean", "ocean"],
     "ILD":        [50.0, 50.0, 50.0],
@@ -37,7 +37,6 @@ df = pd.DataFrame({
     "ocean":      [True, True, True],
     "ocean_next": [True, True, True],
     "mean_stl1":  [0.0, 0.0, 0.0],
-    "mean_fsr":   [0.0, 0.0, 0.0],
     "mean_swvl1": [0.0, 0.0, 0.0],
 })
 
@@ -118,9 +117,8 @@ List of valid basin names.
 | rh600        | Relative humidity at 600 hPa         | %             |
 | ocean        | ocean fraction at the current position | —           |
 | ocean_next   | ocean fraction at the next 6-hour position | —       |
-| mean_stl1    | Land-weighted soil temperature       | K             |
-| mean_fsr     | Land-weighted surface roughness length | m           |
-| mean_swvl1   | Land-weighted soil water volume      | m^3 m^−3      |
+| mean_stl1    | Land-weighted soil temperature, 0.2·stl1·(1−ocean) + 0.8·stl1_next·(1−ocean_next) | K |
+| mean_swvl1   | Land-weighted soil water volume, 0.2·swvl1·(1−ocean) + 0.8·swvl1_next·(1−ocean_next) | m^3 m^−3 |
 
 ## Model Details
 
@@ -131,9 +129,11 @@ This package contains pre-trained Input-Output Hidden Markov Models (IOHMM) for 
 3. **Potential intensity (pi)**: Theoretical upper bound on storm strength
 4. **Wind shear (shr)**: Vertical wind shear affecting intensification
 5. **Mid-level humidity (rh600)**: Environmental moisture affecting intensification
-6. **Land effects (mean_fsr, mean_stv1, mean_swvl1)**: Land and soil conditions affecting over-land decay
+6. **Land effects (mean_stl1, mean_swvl1)**: Soil temperature and moisture setting the land enthalpy flux that slows over-land decay
 
-Each basin has its own pre-trained IOHMM parameters and land-mode regression coefficients.
+Over land, wind decays exponentially toward 10 kt: v_next = 10 + (v − 10)·exp(−α·L̄), where L̄ = 0.2·(1−ocean) + 0.8·(1−ocean_next), α = exp(g0 + g1·E), and E = θ̄·max(0, exp(0.07·(T̄ − 299)) − 1), with T̄ = mean_stl1/L̄ and θ̄ = mean_swvl1/L̄.
+
+Each basin has its own pre-trained IOHMM parameters and land-decay coefficients (g0, g1).
 
 ## License
 
@@ -143,4 +143,12 @@ MIT License
 
 If you use this package in your research, please cite:
 
-Gao, Cong, Ning Lin. "PepC-Global: A Basin-Tuned Probabilistic Tropical Cyclone Model with Enhanced Out-of-Sample Skill and Climate-Sensitive Over-Land Decay". Journal of Advances in Modeling Earth Systems (JAMES), under review.
+**Method development**
+
+Gao, Cong, and Ning Lin. "PepC-Global: A Basin-Tuned Probabilistic Tropical Cyclone Model with Enhanced Out-of-Sample Skill and Climate-Sensitive Over-Land Decay." Journal of Advances in Modeling Earth Systems (JAMES), under review. Available at https://arxiv.org/abs/2609.14259.
+
+**Applications**
+
+Gao, Cong, and Ning Lin. "Recent increase in near-perpendicular tropical cyclone landfall fraction projected to emerge under high-emissions warming." Submitted. Available at https://arxiv.org/abs/2610.00975.
+
+Gao, Cong, and Ning Lin. "A common warming-dependent decline emerges from divergent projections of tropical cyclone frequency." Geophysical Research Letters, under review. Available at https://arxiv.org/abs/2609.16521.
